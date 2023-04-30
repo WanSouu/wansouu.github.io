@@ -2,7 +2,10 @@ let money=0;
 let money_per_click=0.01;
 let money_per_second=0;
 let elements, pos;
-
+/*
+= TO DO =
+1. ADD FUNCTIONALITY FOR LOOT ITEMS
+*/
 class shop_item {
   constructor(name,description, price,on_buy) {
     this.name=name;
@@ -23,9 +26,13 @@ function onBuy() {
   }
 }
 let shop_items=[
-  new shop_item("Better clicks","Get $0.01 more per click!", 0.15,() => {money_per_click+=0.01}),
-  new shop_item("Auto clicks","Get $0.01 per second!", 0.5,() => {money_per_second+=0.005}),
-  new shop_item("Starter","Open a Lootbag!", 0.00,() => {openLootbox("Loot bag")}),
+  new shop_item("Better clicks","Get $0.01 more per click!", 0.1,() => {money_per_click+=0.01}),
+  new shop_item("Auto clicks","Get $0.1 per second!", 0.49,() => {money_per_second+=0.1}),
+  new shop_item("Trashbag","Open a Trashbag!", 0.25,() => {openLootbox("Trashbag")}),
+  new shop_item("Starter box","Open a Starter box!", 0.99,() => {openLootbox("Starter box")}),
+  new shop_item("Lootbag","Open a Lootbag!", 3.99,() => {openLootbox("Lootbag")}),
+  new shop_item("Snackbox","Open a Snackbox!", 9.99,() => {openLootbox("Snackbox")}),
+  new shop_item("Gamma 2 Case","Open a Gamma 2 Case!", 49.99,() => {openLootbox("Gamma 2 Case")}),
   
 ]
 function updateWallet() {
@@ -44,10 +51,12 @@ function gameInit() {
     shop_wrapper: document.getElementById("shop-wrapper"),
     shop: document.getElementById("shop-list"),
     spinner: document.getElementById("lootbox-spinner"),
-    spinner_wrapper: document.getElementById("lootbox-wrapper")
+    spinner_wrapper: document.getElementById("lootbox-wrapper"),
+    inventory: document.getElementById("inventory-wrapper"),
+    loot_card: document.getElementById("loot-card")
   }
   for(var i = 0; i < shop_items.length; i++) {
-    cur=document.createElement("li")
+    cur=document.createElement("div")
     shop_items[i].id=i;
     cur.innerHTML=insertItemText(shop_items[i])
     cur.getElementsByTagName("button")[0].onclick=onBuy;
@@ -89,13 +98,14 @@ setInterval(() => {
 },1000)
 
 let rarity={
-  common: {id: 1, chance: 1.00, color: "#FFFFFF"},
-  uncommon: {id: 2, chance: 0.5, color: "#B9F18C"},
-  rare: {id: 3, chance: 0.3, color: "#9EBDE6"},
-  unique: {id: 4, chance: 0.1, color: "#ED6A5A"},
-  extraordinary: {id: 5, chance: 0.05, color: "#9B7EDE"},
-  rngesus: {id: 6, chance:0.025, color: "#FF2ECC"}
+  common: {id: 0, chance: 1.00, color: "#FFFFFF"},
+  uncommon: {id: 1, chance: 0.4, color: "#B9F18C"},
+  rare: {id: 2, chance: 0.125, color: "#9EBDE6"},
+  unique: {id: 3, chance: 0.033, color: "#ED6A5A"},
+  extraordinary: {id: 4, chance: 0.01, color: "#9B7EDE"},
+  rngesus: {id: 5, chance:0.005, color: "#FF2ECC"}
 }
+let rarity_names=["common","uncommon","rare","unique","extraordinary","rngesus"]
 class lootbox_class {
   constructor(name,loot_array) {
     this.name=name;
@@ -121,7 +131,9 @@ class loot_class {
     this.rarity=rarity;
     this.func=func;
     loot_info.items.get(rarity.id).push(this)
+    loot_info.item_names.set(name,this)
     loot_info.inventory.set(name,0)
+    
   }
   add_item() {
     loot_info.inventory.set(this.name,loot_info.inventory.get(this.name)+1)
@@ -129,11 +141,14 @@ class loot_class {
 }
 let loot_info={
   items: new Map(),
+  item_names: new Map(),
   inventory: new Map(),
   loot: [],
   boxes: []
 };
+function updateInventory() {
 
+}
 function initLootbox() {
   for(var i = 0; i < 10; i++) {
     loot_info.items.set(i,[]);
@@ -141,29 +156,58 @@ function initLootbox() {
 
   
   loot_info.loot = [
-    new loot_class(rarity.common,       "Common",       "Clicks for you every second!",          () => {this.add_item()}),
-    new loot_class(rarity.uncommon,       "Uncommon",       "It's kinda useless since you can't see it.",          () => {this.add_item()}),
-    new loot_class(rarity.rare,       "Rare",       "It's kinda useless since you can't see it.",          () => {this.add_item()}),
-    new loot_class(rarity.unique,       "Unique",       "It's kinda useless since you can't see it.",          () => {this.add_item()}),
-    new loot_class(rarity.extraordinary,       "Extraordinary",       "It's kinda useless since you can't see it.",          () => {this.add_item()}),
-    new loot_class(rarity.rngesus,       "Rngesus",       "It's kinda useless since you can't see it.",          () => {this.add_item()}),
+    new loot_class(rarity.common,       "Sock",       "This is a description for a common item!",          () => {this.add_item()}),
+    new loot_class(rarity.common,       "Mug",       "This is a description for a common item!",          () => {this.add_item()}),
+    new loot_class(rarity.common,       "Leaf",       "This is a description for a common item!",          () => {this.add_item()}),
+    new loot_class(rarity.common,       "Pipe",       "This is a description for a common item!",          () => {this.add_item()}),
+    new loot_class(rarity.common,       "Mud",       "This is a description for a common item!",          () => {this.add_item()}),
+    
+    new loot_class(rarity.uncommon,       "MP3 Player",       "This is a description for a uncommon item!",          () => {this.add_item()}),
+    new loot_class(rarity.uncommon,       "Coffee",       "This is a description for a uncommon item!",          () => {this.add_item()}),
+    new loot_class(rarity.uncommon,       "Pug",       "This is a description for a uncommon item!",          () => {this.add_item()}),
+    new loot_class(rarity.uncommon,       "Prawn",       "This is a description for a uncommon item!",          () => {this.add_item()}),
+    new loot_class(rarity.uncommon,       "Cocktail",       "This is a description for a uncommon item!",          () => {this.add_item()}),
+    
+    new loot_class(rarity.rare,       "Radio",       "This is a description for a rare item!",          () => {this.add_item()}),
+    new loot_class(rarity.rare,       "Gun",       "This is a description for a rare item!",          () => {this.add_item()}),
+    new loot_class(rarity.rare,       "Silver pipe",       "This is a description for a rare item!",          () => {this.add_item()}),
+    new loot_class(rarity.rare,       "MP4 Player",       "This is a description for a rare item!",          () => {this.add_item()}),
+    new loot_class(rarity.rare,       "Chicken Nugget",       "This is a description for a rare item!",          () => {this.add_item()}),
+
+
+    new loot_class(rarity.unique,       "Golden pipe",       "This is a description for a unique item!",          () => {this.add_item()}),
+    new loot_class(rarity.unique,       "MP5 Player",       "This is a description for a unique item!",          () => {this.add_item()}),
+    new loot_class(rarity.unique,       "Caviar",       "This is a description for a unique item!",          () => {this.add_item()}),
+    new loot_class(rarity.unique,       "All of Politics",       "This is a description for a unique item!",          () => {this.add_item()}),
+    new loot_class(rarity.unique,       "Book of wisdom",       "This is a description for a unique item!",          () => {this.add_item()}),
+    
+    new loot_class(rarity.extraordinary,       "Cure for cancer",       "This is a description for a extraordinary item!",          () => {this.add_item()}),
+    new loot_class(rarity.extraordinary,       "Karambit",       "This is a description for a extraordinary item!",          () => {this.add_item()}),
+    new loot_class(rarity.extraordinary,       "Tucan",       "This is a description for a extraordinary item!",          () => {this.add_item()}),
+    new loot_class(rarity.extraordinary,       "Gum",       "This is a description for a extraordinary item!",          () => {this.add_item()}),
+    new loot_class(rarity.extraordinary,       "Dev tools",       "This is a description for a extraordinary item!",          () => {this.add_item()}),
+    
+    new loot_class(rarity.rngesus,       "Holy sock",       "This is a description for a rngesus item!",          () => {this.add_item()}),
+    new loot_class(rarity.rngesus,       "Holy mug",       "This is a description for a rngesus item!",          () => {this.add_item()}),
+    new loot_class(rarity.rngesus,       "Holy leaf",       "This is a description for a rngesus item!",          () => {this.add_item()}),
+    new loot_class(rarity.rngesus,       "Holy pipe",       "This is a description for a rngesus item!",          () => {this.add_item()}),
+    new loot_class(rarity.rngesus,       "Holy mud",       "This is a description for a rngesus item!",          () => {this.add_item()})
+    
     
     
   ],
   loot_info.boxes = [
     // remember to order rarities from lowest to highest
-    new lootbox_class("Starter",[rarity.common  ,rarity.uncommon]),
-    new lootbox_class("Stash",[rarity.common,  rarity.uncommon,  rarity.rare]),
-    new lootbox_class("Bag",[rarity.uncommon]),
-    new lootbox_class("Trash Bag",[rarity.common]),
-    new lootbox_class("Mailbox",[rarity.rare]),
-    new lootbox_class("Loot bag",[rarity.common, rarity.uncommon, rarity.rare, rarity.unique, rarity.extraordinary, rarity.rngesus]),
+    new lootbox_class("Trashbag",[rarity.common  ,rarity.uncommon]),
+    new lootbox_class("Starter box",[rarity.common,  rarity.uncommon,  rarity.rare]),
+    new lootbox_class("Lootbag",[rarity.common, rarity.uncommon, rarity.rare, rarity.unique, rarity.extraordinary, rarity.rngesus]),
+    new lootbox_class("Snackbox",[rarity.rare, rarity.unique, rarity.extraordinary, rarity.rngesus]),
+    new lootbox_class("Gamma 2 Case",[rarity.unique, rarity.extraordinary, rarity.rngesus])
     
   ]
 }
 function updateSpinningItems() {
   lootbox_item=document.getElementsByClassName("lootbox-item")
-  console.log("UPDATING ITEMS");
   for(var i = lootbox_items-1; i > 0; i--) {
     lootbox_item[i].innerHTML=lootbox_item[i-1].innerHTML;
   }
@@ -171,26 +215,29 @@ function updateSpinningItems() {
   //console.log("cur",cur_item);
   lootbox_item[0].innerHTML=
   `
-  <div class="item-name" style="background-color: ${cur_item.rarity.color}"}>
-  ${cur_item.name}
-  </div>
+  <div class="item-name" style="background-color: ${cur_item.rarity.color}"}>${cur_item.name}</div>
   `
 }
 let animation_duration=0.2;
 let animation_dur_increase=0.0005
 var cur_p=0;
 let animation_state=-1
+let animation_timeout;
 function animateLootbox() {
   if (stopLootbox==true) { return; }
+  animation_duration*=1+animation_dur_increase
   lootboxAnimationToggle()
-  setTimeout(() => {
+  updateSpinningItems();
+  animation_timeout=setTimeout(() => {
     if (stopLootbox==true) { return; }
+    animation_duration*=1+animation_dur_increase
     lootboxAnimationToggle()
+    
     updateSpinningItems();
-    setTimeout(() => {
+    animation_timeout=setTimeout(() => {
       animateLootbox();
       if (stopLootbox==true) { return; }
-      updateSpinningItems();
+      
     }, animation_duration*1000)
   },animation_duration*1000)
 }
@@ -199,8 +246,8 @@ let stop_at;
 let cur_padding={ left: 0, right: 0, changing: 0}
 let middle_item=5;
 function lootboxAnimationToggle() {
+  minimum_duration=2+(Math.random()-0.275)*3
   animation_state*=-1
-  animation_duration*=1+animation_dur_increase
   animation_dur_increase*=1.4+((Math.random()-0.5)*0.25)
   if (animation_state==1) {
     elements.spinner.style.transition="padding-left 0s linear, padding-right "+animation_duration+"s linear";
@@ -237,11 +284,39 @@ function lootboxStop() {
   }
   elements.spinner_wrapper.classList.toggle("spinner-open");
   elements.shop_wrapper.classList.toggle("shop-open");
-  alert("You got:" + lootboxGetItem().replace(/\n|\r/g, "") + "!");
-  setTimeout(() => {
-    stopLootbox=true;
-  },1000)
+  elements.loot_card.classList.toggle("show-loot");
+  
+  clearTimeout(animation_timeout)
+  lootbox_item_got= loot_info.item_names.get(lootboxGetItem().replace(/\n|\r/g, ""))
+  inventory_item=document.createElement("div")
+  inventory_item.classList.add("inventory-item")
+  inventory_item.innerHTML=lootbox_item_got.name
+  inventory_item.style.backgroundColor=lootbox_item_got.rarity.color
+
+  elements.loot_card.style.border="10px solid " + lootbox_item_got.rarity.color
+  
+  lootboxCardSet(lootbox_item_got);
+  
+  elements.inventory.appendChild(inventory_item)
 }
+function lootboxCardSet(item) {
+  elements.loot_card.innerHTML=
+  `
+  <div class="loot-card-top">
+        <div class="loot-card-title">${item.name}!</div>
+        <div class="loot-card-rarity" style="color: ${item.rarity.color}">${rarity_names[item.rarity.id]}</div>
+  </div>
+  <div class="loot-card-description">
+    ${item.desc}  
+  </div>
+  <button class="loot-card-button font-bold" style="border-color: ${item.rarity.color}; color: ${item.rarity.color};" onclick="lootcardClose()">OKAY.</button>
+  `
+}
+function lootcardClose() {
+  elements.loot_card.classList.toggle("show-loot");
+  stopLootbox=true;
+}
+let lootbox_item_got, inventory_item;
 function lootboxGetItem() {
   return (elements.spinner.children[middle_item].children[0].innerHTML)
 }
@@ -257,7 +332,9 @@ function lootboxAnimation() {
   animation_state=-1
   animation_duration=0.2
   animation_dur_increase=0.0005
-  console.log("min dur: ", minimum_duration)
+  elements.spinner.style.transition="padding-left 0s linear, padding-right 0s linear";
+  elements.spinner.style.paddingLeft="0%";
+  elements.spinner.style.paddingRight="0%";
   animateLootbox();
 }
 function openLootbox(lootbox_name) {
@@ -273,21 +350,16 @@ function openLootbox(lootbox_name) {
     elements.spinner.removeChild(elements.spinner.lastChild);
   }
   for(var i = 0; i < lootbox_items; i++) {
-    console.log(i);
     lootbox_item = document.createElement("div");
     lootbox_item.className="lootbox-item"
     cur_item=lootbox.getLoot()
     //console.log("GOT: ", cur_item);
     lootbox_item.innerHTML=
     `
-    <div class="item-name" style="background-color: ${cur_item.rarity.color}"}>
-    ${cur_item.name}
-    </div>
+    <div class="item-name" style="background-color: ${cur_item.rarity.color}"}>${cur_item.name}</div>
     `
     elements.spinner.append(lootbox_item)
-    console.log("---", i);
   }
-  console.log("---", i);
   lootboxAnimation()
 }
 function getLootbox(lootbox_name) {
