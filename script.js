@@ -96,7 +96,7 @@ class loot_class {
 
 let animation_timeout, unboxed_item, cur, elements, pos, stop_at, inventory_item, seed, cur_item, lootbox_item, shop_items;
 
-let money=22220; // Starting money
+let money=0; // Starting money
 let money_per_click=0.01; // Money gained per click
 let money_per_second=0; // Money gained per second
 let money_per_click_passive=0; // Passive money per click 
